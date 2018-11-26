@@ -255,9 +255,11 @@ internal class _XMLStackParser: NSObject, XMLParserDelegate {
     
     var currentElementName: String?
     var currentElementData = ""
+    var sortOrderKey: String?
     
-    static func parse(with data: Data) throws -> [String: Any] {
+    static func parse(with data: Data, sortOrderKey: String? = nil) throws -> [String: Any] {
         let parser = _XMLStackParser()
+        parser.sortOrderKey = sortOrderKey
         
         do {
             if let node = try parser.parse(with: data) {
@@ -294,6 +296,11 @@ internal class _XMLStackParser: NSObject, XMLParserDelegate {
         stack.append(node)
         
         if let currentNode = currentNode {
+            if let sortOrderKey = sortOrderKey {
+                let count = currentNode.children.reduce(into: 0, { $0 += $1.value.count })
+                node.attributes[sortOrderKey] = String(count + 1)
+            }
+
             if currentNode.children[elementName] != nil {
                 currentNode.children[elementName]?.append(node)
             } else {

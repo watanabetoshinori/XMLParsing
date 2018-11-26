@@ -186,6 +186,9 @@ open class XMLDecoder {
     /// Contextual user-provided information for use during decoding.
     open var userInfo: [CodingUserInfoKey : Any] = [:]
     
+    /// The key to use for sort order.
+    open var sortOrderKey = "sortOrder"
+    
     /// Options set on the top-level encoder to pass down the decoding hierarchy.
     internal struct _Options {
         let dateDecodingStrategy: DateDecodingStrategy
@@ -219,7 +222,7 @@ open class XMLDecoder {
     open func decode<T : Decodable>(_ type: T.Type, from data: Data) throws -> T {
         let topLevel: [String: Any]
         do {
-            topLevel = try _XMLStackParser.parse(with: data)
+            topLevel = try _XMLStackParser.parse(with: data, sortOrderKey: self.sortOrderKey)
         } catch {
             throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: [], debugDescription: "The given data was not valid XML.", underlyingError: error))
         }
